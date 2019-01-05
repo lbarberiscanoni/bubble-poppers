@@ -6,23 +6,20 @@ import pickle
 import json
 from tqdm import tqdm
 from tensorforce.agents import PPOAgent
+import numpy as np
 
 class Audience:
 
 	def __init__(self, population_size, content):
-		self.graph = nx.Graph()
+		self.graph = np.full((population_size, len(content)), 0)
 		self.user_base = {}
 		self.item_dimensions = len(content[content.keys()[0]])
 
 		for i in range(population_size):
 			local_user = User(i, self.item_dimensions)
 			self.user_base[i] = local_user
-			self.graph.add_node(i)
 
 		self.content = content
-
-		for content_index in content.keys():
-			self.graph.add_node(content_index)
 
 distribution = range(10)
 
@@ -39,26 +36,18 @@ for x in tqdm(distribution):
 
 G = Audience(20, content)
 
-matrix = nx.to_numpy_matrix(G.graph)
-
-print("matrix made")
-
 agent = PPOAgent(
-    states={"type":'float', "shape": matrix.shape },
-    actions={
-    	str(1): dict(type="int", num_actions=3)
-    },
+    states={"type":'float', "shape": G.graph.shape },
+    actions=dict(type="int", num_actions=3),
     network=[
 	    dict(type='flatten'),
 	    dict(type="dense", size=32),
-	   	dict(type="dense", size=32),
-	   	dict(type="dense", size=32)
     ],
 )
 
 print("agent ready")
 
-action = agent.act(matrix)
+action = agent.act(G.graph)
 print(action)
 
 
