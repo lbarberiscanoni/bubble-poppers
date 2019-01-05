@@ -1,41 +1,65 @@
 import numpy as np
 from scipy import stats
-
-class User:
-
-	def __init__(self):
-		#taste coefficients initialized at .25
-		self.taste_coefficients = { x: {"value": .25, "history":[.25, .25, .25, .25, .25]} for x in range(4) }
-
-		self.satisfaction_history = [ x for x in np.random.normal(5, 1, 50) ]
-
-	def z_score(self, distribution, value):
-		mean = np.mean(distribution)
-		std = np.std(distribution)
-
-		return (value - mean) / float(std)
-
-	def update_preferences(self, item):
-
-		total = sum(item)
-		for i in range(len(item)):
-			self.taste_coefficients[i]["history"].append(item[i] / float(total))
-			self.taste_coefficients[i]["value"] = np.mean(self.taste_coefficients[i]["history"])
-
-
-	def evaluate(self, item):
-		satisfaction_score = 0
-		for i in range(len(item)):
-			satisfaction_score += (item[i] * self.taste_coefficients[i]["value"])
-		
-		z_score = self.z_score(self.satisfaction_history, satisfaction_score)
-
-		self.satisfaction_history.append(satisfaction_score)
-
-		self.update_preferences(item)
-
-		return z_score
+import networkx as nx
+from user import *
+import pickle
+import json
+from tqdm import tqdm
+from tensorforce.agents import PPOAgent
 
 class Audience:
 
-	
+	def __init__(self, population_size, content):
+		self.graph = nx.Graph()
+		self.user_base = {}
+		self.item_dimensions = len(content[content.keys()[0]])
+
+		for i in range(population_size):
+			local_user = User(i, self.item_dimensions)
+			self.user_base[i] = local_user
+			self.graph.add_node(i)
+
+		self.content = content
+
+		for content_index in content.keys():
+			self.graph.add_node(content_index)
+
+distribution = range(10)
+
+content = {}
+
+index = 100
+for x in tqdm(distribution):
+	for y in distribution:
+		for z in distribution:
+			for w in distribution:
+				item = [x, y, z, w]
+				content[index] = item
+				index += 1
+
+G = Audience(20, content)
+
+matrix = nx.to_numpy_matrix(G.graph)
+
+print("matrix made")
+
+agent = PPOAgent(
+    states={"type":'float', "shape": matrix.shape },
+    actions={
+    	str(1): dict(type="int", num_actions=3)
+    },
+    network=[
+	    dict(type='flatten'),
+	    dict(type="dense", size=32),
+	   	dict(type="dense", size=32),
+	   	dict(type="dense", size=32)
+    ],
+)
+
+print("agent ready")
+
+action = agent.act(matrix)
+print(action)
+
+
+
