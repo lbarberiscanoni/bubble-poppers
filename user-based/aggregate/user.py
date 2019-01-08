@@ -20,6 +20,7 @@ class User:
 	def update_preferences(self, item):
 
 		total = sum(item)
+		print(item, total)
 		for i in range(len(item)):
 			self.taste_coefficients[i]["history"].append(item[i] / float(total))
 			self.taste_coefficients[i]["value"] = np.mean(self.taste_coefficients[i]["history"])

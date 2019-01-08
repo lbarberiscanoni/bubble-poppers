@@ -10,17 +10,15 @@ import numpy as np
 
 class Audience:
 
-	def __init__(self, population_size):
+	def __init__(self, population_size, distribution):
 
 		self.content = {}
 
-		distribution = range(10)
-
 		index = 0
-		for x in distribution:
-			for y in distribution:
-				for z in distribution:
-					for w in distribution:
+		for x in range(1, distribution):
+			for y in range(1, distribution):
+				for z in range(1, distribution):
+					for w in range(1, distribution):
 						item = [x, y, z, w]
 						self.content[index] = item
 						index += 1
