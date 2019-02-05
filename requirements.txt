@@ -1,0 +1,26 @@
+absl-py==0.7.0
+astor==0.7.1
+atomicwrites==1.3.0
+attrs==18.2.0
+decorator==4.3.2
+gast==0.2.2
+grpcio==1.18.0
+h5py==2.9.0
+Keras-Applications==1.0.7
+Keras-Preprocessing==1.0.8
+Markdown==3.0.1
+more-itertools==5.0.0
+networkx==2.2
+numpy==1.16.1
+pluggy==0.8.1
+protobuf==3.6.1
+py==1.7.0
+pytest==4.2.0
+scipy==1.2.0
+six==1.12.0
+tensorboard==1.12.2
+tensorflow==1.12.0
+-e git+https://github.com/tensorforce/tensorforce@085fab2c132e3d12ef3d0f6eaf361b22446f5c35#egg=Tensorforce
+termcolor==1.1.0
+tqdm==4.30.0
+Werkzeug==0.14.1

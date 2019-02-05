@@ -25,7 +25,7 @@ class Audience:
 
 		self.graph = np.full((population_size, len(self.content)), 0)
 		self.user_base = {}
-		self.item_dimensions = len(self.content[self.content.keys()[0]])
+		self.item_dimensions = len(self.content[list(self.content.keys())[0]])
 
 		for i in range(population_size):
 			local_user = User(i, self.item_dimensions)

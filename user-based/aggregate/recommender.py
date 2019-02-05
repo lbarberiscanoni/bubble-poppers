@@ -24,8 +24,8 @@ if args.agent == "ppo":
     agent = PPOAgent(
         states={"type":'float', "shape": G.graph.shape },
         actions={
-        "user": dict(type="int", num_actions=G.graph.shape[0]),
-        "item": dict(type="int", num_actions=G.graph.shape[1])
+        "user": dict(type="int", num_values=G.graph.shape[0]),
+        "item": dict(type="int", num_values=G.graph.shape[1])
         },
         network=[
     	    dict(type='flatten'),
@@ -36,8 +36,8 @@ elif args.agent == "dqn":
     agent = DQNAgent(
         states={"type":'float', "shape": G.graph.shape },
         actions={
-        "user": dict(type="int", num_actions=G.graph.shape[0]),
-        "item": dict(type="int", num_actions=G.graph.shape[1])
+        "user": dict(type="int", num_values=G.graph.shape[0]),
+        "item": dict(type="int", num_values=G.graph.shape[1])
         },
         network=[
             dict(type='flatten'),
@@ -49,8 +49,8 @@ elif args.agent == "vpg":
     agent = VPGAgent(
         states={"type":'float', "shape": G.graph.shape },
         actions={
-        "user": dict(type="int", num_actions=G.graph.shape[0]),
-        "item": dict(type="int", num_actions=G.graph.shape[1])
+        "user": dict(type="int", num_values=G.graph.shape[0]),
+        "item": dict(type="int", num_values=G.graph.shape[1])
         },
         network=[
             dict(type='flatten'),
@@ -59,6 +59,7 @@ elif args.agent == "vpg":
     )
 
 print("agent ready", agent)
+agent.initialize()
 
 if args.process == "train":
     epochs = 1
@@ -78,3 +79,9 @@ if args.process == "train":
                 agent.observe(reward=reward, terminal=False)
             else:
                 agent.observe(reward=reward, terminal=True)   
+
+    agent.save(directory="./saved", filename=None)
+    print("agent saved")
+
+if args.process == "test":
+    agent.restore(directory="./saved", filename=None)
