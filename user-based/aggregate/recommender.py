@@ -9,6 +9,8 @@ from tensorforce.agents import PPOAgent, DQNAgent, VPGAgent
 import numpy as np
 from audience import *
 import argparse
+import copy
+from tensorforce.agents import VPGAgent
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--agent", help="select an agent type [ppo, vpg, dqn]")
@@ -19,6 +21,9 @@ args = parser.parse_args()
 G = Audience(20, 10)
 
 print("graph shape", G.graph.shape)
+
+
+
 
 if args.agent == "ppo":
     agent = PPOAgent(
@@ -58,14 +63,18 @@ elif args.agent == "vpg":
         ],
     )
 
+
+
+
 print("agent ready", agent)
+new_agent = copy.deepcopy(agent)
 agent.initialize()
 
 if args.process == "train":
     epochs = 1
     for epoch in range(epochs):
         #100 reccomendations for every user
-        training_size = G.graph.shape[0] * 100
+        training_size = G.graph.shape[0] * 4
         for step in range(training_size):
             action = agent.act(G.graph)
 
@@ -80,8 +89,11 @@ if args.process == "train":
             else:
                 agent.observe(reward=reward, terminal=True)   
 
-    agent.save(directory="./saved", filename=None)
+    agent.save(directory="/Users/lbarberiscanoni/Lorenzo/Github/bubble-poppers/user-based/aggregate/saved", filename=None)
     print("agent saved")
+    agent.close()
+    new_agent.restore(directory="/Users/lbarberiscanoni/Lorenzo/Github/bubble-poppers/user-based/aggregate/saved", filename=None)
+    print("restored")
 
 if args.process == "test":
-    agent.restore(directory="./saved", filename=None)
+    agent.restore(directory="saved", filename=None)
