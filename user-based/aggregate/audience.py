@@ -18,10 +18,9 @@ class Audience:
 		for x in range(1, distribution):
 			for y in range(1, distribution):
 				for z in range(1, distribution):
-					for w in range(1, distribution):
-						item = [x, y, z, w]
-						self.content[index] = item
-						index += 1
+					item = [x, y, z]
+					self.content[index] = item
+					index += 1
 
 		self.graph = np.full((population_size, len(self.content)), 0)
 		self.user_base = {}

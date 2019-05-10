@@ -3,7 +3,7 @@ import os
 import sys
 import unittest
 
-from tensorforce.agents import VPGAgent
+from tensorforce.agents import VPGAgent, TRPOAgent
 from tensorforce.tests.unittest_base import UnittestBase
 
 from audience import *
@@ -21,7 +21,7 @@ class TestSaving(UnittestBase, unittest.TestCase):
 		return agent, environment
 
 	def run(self):
-		agent = VPGAgent(
+		agent = TRPOAgent(
 			states = dict(type='float', shape=(30,1000,)),
 		    #states={"type":'float', "shape": (20, 6561,) },
 		    actions={
@@ -30,13 +30,13 @@ class TestSaving(UnittestBase, unittest.TestCase):
 		    },
 		    network=[
 		        dict(type='flatten'),
-		        dict(type="dense", size=32),
 		    ],
+		    memory=1000,
 		)
-		# #agent, environment = self.saving_prepare(name='explicit-default')
+		#agent, environment = self.saving_prepare(name='explicit-default')
 		# restored_agent = copy.deepcopy(agent)
-		# agent.initialize()
-		# agent.save(directory='/Users/lbarberiscanoni/Lorenzo/Github/bubble-poppers/user-based/aggregate/saved',filename=None)
+		agent.initialize()
+		agent.save(directory='/Users/lbarberiscanoni/Lorenzo/Github/bubble-poppers/user-based/aggregate/saved',filename=None)
 		agent.restore(directory = '/Users/lbarberiscanoni/Lorenzo/Github/bubble-poppers/user-based/aggregate/saved', filename=None)
 		print("Restored -------")
 
