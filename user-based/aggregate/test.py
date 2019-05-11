@@ -30,6 +30,7 @@ class TestSaving(UnittestBase, unittest.TestCase):
 		    },
 		    network=[
 		        dict(type='flatten'),
+		        dict(type="dense", size=32),
 		    ],
 		    memory=1000,
 		)
