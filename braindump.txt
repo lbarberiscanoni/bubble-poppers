@@ -1,0 +1,26 @@
+brainstorming
+
+	there are 3 ways to go about this 
+
+	should they pick the entire thing? 
+		probably not, because it's not about figuring something sooner as opposed to later
+		plus, it's not like the action can be an array of any size 
+
+	dynamic preferences vs non-dynamics preferences? 
+
+	how long is this article anyway? 
+	
+notes
+
+	aggregate
+		state = the user-content laplacian 
+		actions = user + content
+
+	content
+		state = user-content laplacian + content-features laplacian
+		actions = user + content
+
+	mean field 
+		both conditions but with a fractional reward 
+		concerned whether the results just won't stabilize 
+

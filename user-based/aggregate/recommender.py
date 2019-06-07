@@ -87,30 +87,34 @@ agent.initialize()
 
 
 if args.process == "train":
-    epochs = 1
-    for epoch in range(epochs):
-        #100 reccomendations for every user
-        training_size = G.graph.shape[0] * 4
+    epochs = 1000000
+    for epoch in tqdm(range(epochs)):
+        #20 reccomendations for every user
+        training_size = G.graph.shape[0] * 20
         for step in range(training_size):
             action = agent.act(G.graph)
 
-            # print(G.graph)
+            #print(G.graph)
 
             reward = G.recommendation(action["user"], action["item"])
 
-            print(epoch, step, action, reward)
+            #print(epoch, step, action, reward)
 
             if step < training_size:
                 agent.observe(reward=reward, terminal=False)
             else:
                 agent.observe(reward=reward, terminal=True)   
 
-    agent.save(directory="/Users/lbarberiscanoni/Lorenzo/Github/bubble-poppers/user-based/aggregate/saved", filename=None)
+    # agent.save(directory="/Users/lbarberiscanoni/Lorenzo/Github/bubble-poppers/user-based/aggregate/saved", filename=None)
+    # print("agent saved")
+    # agent.close()
+    # new_agent.restore(directory="/Users/lbarberiscanoni/Lorenzo/Github/bubble-poppers/user-based/aggregate/saved", filename=None)
+    # print("restored")
+    agent.save(directory="saved", filename=None)
     print("agent saved")
     agent.close()
-    new_agent.restore(directory="/Users/lbarberiscanoni/Lorenzo/Github/bubble-poppers/user-based/aggregate/saved", filename=None)
+    new_agent.restore(directory="saved", filename=None)
     print("restored")
-
 if args.process == "test":
     agent.restore(directory="/Users/lbarberiscanoni/Lorenzo/Github/bubble-poppers/user-based/aggregate/saved", filename=None)
 
