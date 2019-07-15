@@ -11,6 +11,8 @@ from audience import *
 import argparse
 import copy
 from tensorforce.agents import VPGAgent
+import os
+import subprocess
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--agent", help="select an agent type [ppo, vpg, dqn]")
@@ -21,9 +23,6 @@ args = parser.parse_args()
 G = Audience(30, 10)
 
 # print("graph shape", G.graph.shape)
-
-
-
 
 if args.agent == "ppo":
     agent = PPOAgent(
@@ -79,16 +78,21 @@ elif args.agent == "trpo":
         memory=10000,
     )
 
-
-
 print("agent ready", agent)
 new_agent = copy.deepcopy(agent)
 agent.initialize()
 
+lastEpoch = int(os.listdir("saved/" + args.agent)[2].split("-")[0])
+
+agent.restore(directory="saved/" + args.agent)
+print("restored")
 
 if args.process == "train":
-    epochs = 1000000
-    for epoch in tqdm(range(epochs)):
+    
+    epochs = 100000
+    for epoch in tqdm(range(lastEpoch, epochs)):
+        G = Audience(30, 10)
+
         #20 reccomendations for every user
         training_size = G.graph.shape[0] * 20
         for step in range(training_size):
@@ -105,16 +109,12 @@ if args.process == "train":
             else:
                 agent.observe(reward=reward, terminal=True)   
 
-    # agent.save(directory="/Users/lbarberiscanoni/Lorenzo/Github/bubble-poppers/user-based/aggregate/saved", filename=None)
-    # print("agent saved")
-    # agent.close()
-    # new_agent.restore(directory="/Users/lbarberiscanoni/Lorenzo/Github/bubble-poppers/user-based/aggregate/saved", filename=None)
-    # print("restored")
-    agent.save(directory="saved", filename=None)
-    print("agent saved")
-    agent.close()
-    new_agent.restore(directory="saved", filename=None)
-    print("restored")
-if args.process == "test":
-    agent.restore(directory="/Users/lbarberiscanoni/Lorenzo/Github/bubble-poppers/user-based/aggregate/saved", filename=None)
+        if (epoch % 10) == 0:
+            subprocess.call("rm saved/" + args.agent + "/*", shell=True)
+            fName = str(epoch) + "-agent"
+            agent.save(directory="saved/" + args.agent, filename=fName)
+            print("agent saved")
+            # agent.close()
 
+if args.process == "test":
+    agent.restore(directory="saved/" + args.agent)
