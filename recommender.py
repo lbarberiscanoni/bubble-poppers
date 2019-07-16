@@ -82,10 +82,14 @@ print("agent ready", agent)
 new_agent = copy.deepcopy(agent)
 agent.initialize()
 
-lastEpoch = int(os.listdir("saved/" + args.agent)[2].split("-")[0])
+try:
+    lastEpoch = int(os.listdir("saved/" + args.agent)[2].split("-")[0])
 
-agent.restore(directory="saved/" + args.agent)
-print("restored")
+    agent.restore(directory="saved/" + args.agent)
+    print("restored")
+except:
+    lastEpoch = 0
+    
 
 if args.process == "train":
     
