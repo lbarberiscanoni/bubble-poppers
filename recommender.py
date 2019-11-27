@@ -10,17 +10,18 @@ import numpy as np
 from audience import *
 import argparse
 import copy
-from tensorforce.agents import VPGAgent
 import os
 import subprocess
+import seaborn as sb
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--agent", help="select an agent type [ppo, vpg, dqn]")
 parser.add_argument("--process", help="select process [train, test]")
+parser.add_argument("--contrarian", help="select version [on, off]")
 
 args = parser.parse_args()
 
-G = Audience(30, 10)
+G = Audience(30, 15)
 
 # print("graph shape", G.graph.shape)
 
@@ -89,24 +90,28 @@ try:
     print("restored")
 except:
     lastEpoch = 0
-    
+
 
 if args.process == "train":
     
     epochs = 100000
+    cluster_vals = []
     for epoch in tqdm(range(lastEpoch, epochs)):
-        G = Audience(30, 10)
+        G = Audience(30, 15)
 
         #20 reccomendations for every user
         training_size = G.graph.shape[0] * 20
         for step in range(training_size):
             action = agent.act(G.graph)
 
-            #print(G.graph)
-
             reward = G.recommendation(action["user"], action["item"])
 
-            #print(epoch, step, action, reward)
+            #if contrarian get this
+            if args.contrarian == "on": 
+                cluster_val = G.clustering() + 0.01
+                cluster_vals.append(cluster_val)
+                # print(reward, cluster_val, reward / cluster_val)
+                reward = reward / cluster_val
 
             if step < training_size:
                 agent.observe(reward=reward, terminal=False)
@@ -119,6 +124,8 @@ if args.process == "train":
             agent.save(directory="saved/" + args.agent, filename=fName)
             print("agent saved")
             # agent.close()
+
+    # sb.distplot(cluster_vals)
 
 if args.process == "test":
     agent.restore(directory="saved/" + args.agent)

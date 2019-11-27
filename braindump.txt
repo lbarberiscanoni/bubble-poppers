@@ -24,3 +24,8 @@ notes
 		both conditions but with a fractional reward 
 		concerned whether the results just won't stabilize 
 
+comments
+
+	contrarian incentive structure relies on cosine simliarity 
+	record the satisfaction scores
+	the item-similarity matrix will measure the similarity between any two pairs of items. (https://www.ethanrosenthal.com/2015/11/02/intro-to-collaborative-filtering/)
