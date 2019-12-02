@@ -21,7 +21,7 @@ parser.add_argument("--contrarian", help="select version [on, off]")
 
 args = parser.parse_args()
 
-G = Audience(30, 15)
+G = Audience(20, 15)
 
 # print("graph shape", G.graph.shape)
 
@@ -80,24 +80,25 @@ elif args.agent == "trpo":
     )
 
 print("agent ready", agent)
-new_agent = copy.deepcopy(agent)
-agent.initialize()
-
-try:
-    lastEpoch = int(os.listdir("saved/" + args.agent)[2].split("-")[0])
-
-    agent.restore(directory="saved/" + args.agent)
-    print("restored")
-except:
-    lastEpoch = 0
 
 
 if args.process == "train":
+
+    new_agent = copy.deepcopy(agent)
+    agent.initialize()
+
+    try:
+        lastEpoch = int(os.listdir("saved/" + args.agent)[2].split("-")[0])
+
+        agent.restore(directory="saved/" + args.agent)
+        print("restored")
+    except:
+        lastEpoch = 0
     
     epochs = 100000
     cluster_vals = []
     for epoch in tqdm(range(lastEpoch, epochs)):
-        G = Audience(30, 15)
+        G = Audience(20, 15)
 
         #20 reccomendations for every user
         training_size = G.graph.shape[0] * 20
@@ -128,4 +129,6 @@ if args.process == "train":
     # sb.distplot(cluster_vals)
 
 if args.process == "test":
-    agent.restore(directory="saved/" + args.agent)
+    # agent.restore(directory="/local_scratch/pbs.7152417.pbs02/saved/ppo")
+    print("testing")
+    agent.restore(directory="saved/" + args.agent + "/" + args.contrarian)
