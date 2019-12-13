@@ -114,6 +114,13 @@ if args.process == "train":
                 # print(reward, cluster_val, reward / cluster_val)
                 reward = reward / cluster_val
 
+            #get only the cluster
+            if args.contrarian == "only":
+                cluster_val = G.clustering() + 0.01
+                cluster_vals.append(cluster_val)
+
+                reward = 1 - cluster_val
+
             if step < training_size:
                 agent.observe(reward=reward, terminal=False)
             else:
