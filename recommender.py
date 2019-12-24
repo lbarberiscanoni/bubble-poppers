@@ -90,7 +90,7 @@ if args.process == "train":
     try:
         lastEpoch = int(os.listdir("saved/" + args.agent)[2].split("-")[0])
 
-        agent.restore(directory="saved/" + args.agent)
+        agent.restore(directory="saved/" + args.agent + "/" + args.contrarian)
         print("restored")
     except:
         lastEpoch = 0
@@ -139,3 +139,49 @@ if args.process == "test":
     # agent.restore(directory="/local_scratch/pbs.7152417.pbs02/saved/ppo")
     print("testing")
     agent.restore(directory="saved/" + args.agent + "/" + args.contrarian)
+
+
+    epochs = 1000
+    for epoch in tqdm(range(lastEpoch, epochs)):
+        G = Audience(20, 15)
+
+        ob = {}
+        cluster_vals = []
+        rewards = []
+        #20 reccomendations for every user
+        training_size = G.graph.shape[0] * 20
+        for step in range(training_size):
+            action = agent.act(G.graph)
+
+            reward = G.recommendation(action["user"], action["item"])
+
+            rewards.append(reward)
+
+            #without contrarian still check
+            cluster_val = G.clustering() + 0.01
+            cluster_vals.append(cluster_val)
+
+            #if contrarian get this
+            if args.contrarian == "on": 
+                cluster_val = G.clustering() + 0.01
+                cluster_vals.append(cluster_val)
+                # print(reward, cluster_val, reward / cluster_val)
+                reward = reward / cluster_val
+
+            #get only the cluster
+            if args.contrarian == "only":
+                cluster_val = G.clustering() + 0.01
+                cluster_vals.append(cluster_val)
+
+                reward = 1 - cluster_val
+
+            if step < training_size:
+                agent.observe(reward=reward, terminal=False)
+            else:
+                agent.observe(reward=reward, terminal=True)   
+
+        ob[str(epoch)]["cluster"] = cluster_vals
+        ob[str(epoch)]["reward"] = rewards
+
+        with open("results/" + args.agent + "/" + args.contrarian + ".txt", "w") as resF:
+            json.dump(ob, resF)
