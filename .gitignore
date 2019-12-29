@@ -3,3 +3,4 @@ env/
 tensorforce/
 saved/
 other-stuff/
+data/

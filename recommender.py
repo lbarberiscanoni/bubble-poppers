@@ -102,10 +102,13 @@ if args.process == "train":
 
         #20 reccomendations for every user
         training_size = G.graph.shape[0] * 20
+        changes = []
         for step in range(training_size):
             action = agent.act(G.graph)
 
             reward = G.recommendation(action["user"], action["item"])
+
+            #reward = weight * reward + weight * change
 
             #if contrarian get this
             if args.contrarian == "on": 
@@ -114,12 +117,25 @@ if args.process == "train":
                 # print(reward, cluster_val, reward / cluster_val)
                 reward = reward / cluster_val
 
-            #get only the cluster
-            if args.contrarian == "only":
-                cluster_val = G.clustering() + 0.01
-                cluster_vals.append(cluster_val)
+                #change
+                if (len(cluster_vals) % 10) == 0:
+                    if len(cluster_vals) > 0:
+                        lastCluster = cluster_vals[-1]
+                        newCluster = G.clustering() + 0.01
+                        change = (lastCluster - newCluster) / float(lastCluster)
+                        change = change * 100
+                        # change = abs(change)
+                        changes.append(change)
 
-                reward = 1 - cluster_val
+                        cluster_vals.append(newCluster)
+
+                        reward = change
+            # #get only the cluster
+            # if args.contrarian == "only":
+            #     cluster_val = G.clustering() + 0.01
+            #     cluster_vals.append(cluster_val)
+
+            #     reward = 1 - cluster_val
 
             if step < training_size:
                 agent.observe(reward=reward, terminal=False)
@@ -132,6 +148,7 @@ if args.process == "train":
             agent.save(directory="saved/" + args.agent, filename=fName)
             print("agent saved")
             # agent.close()
+        print(epoch, np.mean(changes))
 
     # sb.distplot(cluster_vals)
 
@@ -167,6 +184,18 @@ if args.process == "test":
                 cluster_vals.append(cluster_val)
                 # print(reward, cluster_val, reward / cluster_val)
                 reward = reward / cluster_val
+
+                #change
+                if (len(cluster_vals) % 10) == 0:
+                    if len(cluster_vals) > 0:
+                        lastCluster = cluster_vals[-1]
+                        newCluster = G.clustering() + 0.01
+                        change = (lastCluster - newCluster) / float(lastCluster)
+                        change = change * 100
+                        # change = abs(change)
+                        changes.append(change)
+                        
+                        reward = change
 
             #get only the cluster
             if args.contrarian == "only":

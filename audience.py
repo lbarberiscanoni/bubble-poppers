@@ -61,4 +61,7 @@ class Audience:
 	def clustering(self):
 		# a = np.reshape(np.random.random_integers(0,0,size=900),(30,30))
 		D = nx.DiGraph(self.user_graph)
+		# a = nx.clustering(D)
+		# b = nx.average_clustering(D)
+		# print(a, b)
 		return nx.average_clustering(D)
